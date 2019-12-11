@@ -83,6 +83,7 @@
           - add routing route-map allow-loopback permit 10 set origin igp
           - add routing route-map allow-loopback deny 20
           - add bgp redistribute connected route-map allow-loopback
+          commit: true
   
   #Setup Play4: Configure the servers for the demo
   - name: configure servers
