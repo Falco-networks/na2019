@@ -9,6 +9,4 @@
   - name: Get routing table from device and store in variable
     shell: ip route
     register: routingtable
-
-  - name: display output
     debug: output.stdout_lines
