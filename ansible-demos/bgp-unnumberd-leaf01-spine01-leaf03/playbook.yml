@@ -23,6 +23,16 @@
         commit: true
       #with_items creates a list from the variables mentiond in the vars.yml file and will parse the list with the commands above. If there a 4 values in the list the commands will run 4 times
       with_items: "{{ devices[ansible_hostname].leaf_ports }}"
+
+    #Task 3: Announce loopbacks in BGP
+    - name: Announce loopbacks in BGP
+      nclu: 
+        commands:
+        - add routing route-map allow-loopback permit 10 match interface lo
+        - add routing route-map allow-loopback permit 10 set origin igp
+        - add routing route-map allow-loopback deny 20
+        - add bgp redistribute connected route-map allow-loopback
+        commit: true
   
   
   #Setup Play2: Configure leaf switches
@@ -64,6 +74,15 @@
           commands:
           - add bgp network {{ devices[ansible_hostname].bgp_network }}
           commit: true
+
+      #Task 5: Announce loopbacks in BGP
+      - name: Announce loopbacks in BGP
+        nclu: 
+          commands:
+          - add routing route-map allow-loopback permit 10 match interface lo
+          - add routing route-map allow-loopback permit 10 set origin igp
+          - add routing route-map allow-loopback deny 20
+          - add bgp redistribute connected route-map allow-loopback
   
   #Setup Play4: Configure the servers for the demo
   - name: configure servers
