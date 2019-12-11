@@ -7,7 +7,7 @@
     tasks:
     #Task 1: Change .inputrc file to enable questionmark auto complete
       - name: Change .inputrc file to enable questionmark auto complete
-        replace: 
+        lineinfile: 
           dest: /home/cumulus/.inputrc 
-          regexp: '# ?: complete' 
+          regexp: '#\s*?:\s*complete.*$'
           replace: ' ?: complete'  
