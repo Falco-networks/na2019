@@ -10,6 +10,4 @@
         replace: 
           dest: /home/cumulus/.inputrc 
           regexp: '# ?: complete' 
-          replace: ' ?: complete'
-          backrefs: yes
-  
+          replace: ' ?: complete'  
