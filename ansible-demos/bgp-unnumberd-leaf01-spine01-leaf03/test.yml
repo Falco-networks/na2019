@@ -1,0 +1,14 @@
+---
+- name: configure servers
+  hosts: server01:server03
+  become: yes
+  vars_files:
+  - vars.yml
+
+  tasks:  
+  - name: Get routing table from device and store in variable
+    command: ip route
+    register: routingtable
+
+  - name: display output
+    debug: msg="{{ routingtable.stdout_lines }}""
