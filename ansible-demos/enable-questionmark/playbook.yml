@@ -10,4 +10,4 @@
         lineinfile: 
           dest: /home/cumulus/.inputrc 
           regexp: '#\s*?:\s*complete.*$'
-          replace: ' ?: complete'  
+          line: ' ?: complete'  
