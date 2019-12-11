@@ -106,7 +106,12 @@
       - name: ifup eth1 on servers
         command: ifup eth1
       
-      #Task3: Creates temporary static route for 192.168.0.0/16 prefix to attached leaf switch. This is needed because the server learns te default route over the mgmt network
+      #Task 3: Get routing table from device and store in variable
+      - name: Get routing table from device and store in variable
+        command: ip route
+        register: routingtable
+
+      #Task4: Creates temporary static route for 192.168.0.0/16 prefix to attached leaf switch. This is needed because the server learns te default route over the mgmt network
       - name: Add static route to server
         command: ip route add 192.168.0.0/16 via {{ devices[ansible_hostname].gateway }}
             
