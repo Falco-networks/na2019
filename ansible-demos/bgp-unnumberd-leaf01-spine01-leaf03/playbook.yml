@@ -114,7 +114,7 @@
       #Task4: Creates temporary static route for 192.168.0.0/16 prefix to attached leaf switch. This is needed because the server learns te default route over the mgmt network
       - name: Add static route to server
         command: ip route add 192.168.0.0/16 via {{ devices[ansible_hostname].gateway }}
-        when: "'192.168.0.0/16' in routingtable"
+        when: "'192.168.0.0/16' not in routingtable"
             
   
   
