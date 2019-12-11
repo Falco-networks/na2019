@@ -10,4 +10,4 @@
     shell: ip route
     register: routingtable
     
-  - debug: output.stdout_lines
+  - debug: var=output.stdout_lines
