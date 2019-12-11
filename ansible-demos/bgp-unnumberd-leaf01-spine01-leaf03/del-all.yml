@@ -29,13 +29,12 @@
         command: ifdown eth1
 
       - name: Reboot server
-        command: reboot
-        async: 10
+        shell: "sleep 5 && reboot"
+        async: 1
         poll: 0
 
       - name: Wait for hosts to finish reboot
         wait_for:
-          port: "{{ (ansible_port|default(ansible_ssh_port))|default(22) }}"
           host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
           search_regex: OpenSSH
           delay: 10
