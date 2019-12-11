@@ -9,7 +9,7 @@
       - name: Change .inputrc file to enable questionmark auto complete
         lineinfile: 
           dest: /home/cumulus/.inputrc 
-          regexp: '# ?: complete' 
+          regexp: '^(.*)# ?: complete(.*)$' 
           line: ' ?: complete'
           backrefs: yes
   
