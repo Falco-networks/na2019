@@ -110,11 +110,12 @@
       #Task 3: Get routing table from device and store in variable
       - name: Get routing table from device and store in variable
         command: ip route
-        register: routingtable
+        register: routingtable #Register output of the command ip route in a variable routingtabel
 
       #Task4: Creates temporary static route for 192.168.0.0/16 prefix to attached leaf switch. This is needed because the server learns te default route over the mgmt network
       - name: Add static route to server
         command: ip route add 192.168.0.0/16 via {{ devices[ansible_hostname].gateway }}
+        #Only run the tasks when the string 192.168.0.0/16 is not in the routingtables variable. When the string is present skip the task
         when: "'192.168.0.0/16' | string not in routingtable.stdout"
             
   
