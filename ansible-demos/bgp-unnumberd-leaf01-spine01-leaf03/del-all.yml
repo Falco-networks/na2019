@@ -29,7 +29,7 @@
         command: ifdown eth1
 
       - name: Reboot server
-        command: reboot now
+        command: reboot
         async: 10
         poll: 0
 
