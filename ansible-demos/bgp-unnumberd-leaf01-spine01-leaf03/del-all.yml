@@ -22,7 +22,7 @@
       - name: Delete interface config from server
         blockinfile:
           path: /etc/network/interfaces
-          marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+          marker: "# {mark} ANSIBLE MANAGED BLOCK"
           block: ""
 
       - name: Bring interface eth1 down
