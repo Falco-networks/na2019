@@ -11,4 +11,4 @@
     register: routingtable
 
   - name: display output
-    debug: msg="{{ routingtable }}""
+    debug: {{ routingtable }}
