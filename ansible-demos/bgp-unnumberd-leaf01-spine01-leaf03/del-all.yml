@@ -29,4 +29,5 @@
         command: ifdown eth1
 
       - name: Reboot server
-        command: reboot now
+        reboot:
+          reboot_timeout: 60
