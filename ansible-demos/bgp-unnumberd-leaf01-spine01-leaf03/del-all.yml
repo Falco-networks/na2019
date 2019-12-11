@@ -11,3 +11,22 @@
           commands:
           - del all
           commit: true
+
+
+    #Setup Play2: delete interface config from servers and reboot the server
+    - name: delete interface config from servers and reboot the server
+      hosts: server01:server03
+      become: yes
+
+      tasks:
+      - name: Delete interface config from server
+        blockinfile:
+          path: /etc/network/interfaces
+          marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+          block: ""
+
+      - name: Bring interface eth1 down
+        command: ifdown eth1
+
+      - name: Reboot server
+        command: reboot now
