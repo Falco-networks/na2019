@@ -1,0 +1,13 @@
+---
+    #Setup Play1: delete config on all switches
+    - name: Delete config on all switches
+      hosts: spine01:leaf01:leaf03
+      become: yes
+
+      tasks:
+      #Task 1: Delete config on all switches
+      - name: Delete config on all switches
+        nclu:
+          commands:
+          - del all
+          commit: true
