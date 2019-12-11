@@ -29,4 +29,20 @@
         command: ifdown eth1
 
       - name: Reboot server
-        reboot:
+        command: reboot now
+        async: 10
+        poll: 0
+
+      - name: Wait for hosts to finish reboot
+        wait_for:
+          port: "{{ (ansible_port|default(ansible_ssh_port))|default(22) }}"
+          host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+          search_regex: OpenSSH
+          delay: 10
+          connection: local
+
+      - name: Check the uptime post reboot
+        shell: uptime
+        register: UPTIME_POST_REBOOT
+
+      - debug: msg={{UPTIME_POST_REBOOT.stdout}}
