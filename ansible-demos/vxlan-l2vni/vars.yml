@@ -1,0 +1,48 @@
+---
+devices:
+    spine01:
+        hostname: "spine01"
+        loopback: "10.0.0.21/32"
+        as: "65020"
+        leaf_ports: 
+            - "swp1"
+            - "swp2"
+
+    leaf01:
+        hostname: "leaf01"
+        loopback: "10.0.0.11/32"
+        as: "65011"
+        spine_ports:
+            - "swp51"
+        vlans:
+            - { vid: "10", ip: "192.168.10.11/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
+            - { vid: "20", ip: "192.168.20.11/24", vrr_ip: "192.168.20.1/24", vrr_mac: "00:00:00:00:1a:20" }
+        vxlan:
+            - { vni: "vni10", vid: "10" }
+            - { vni: "vni20", vid: "20" }
+        server_port: "swp1"
+            
+
+    leaf02:
+        hostname: "leaf02"
+        loopback: "10.0.0.12/32"
+        as: "65012"
+        spine_ports:
+            - "swp51"
+        vlans:
+            - { vid: "10", ip: "192.168.10.12/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
+            - { vid: "20", ip: "192.168.20.12/24", vrr_ip: "192.168.20.1/24", vrr_mac: "00:00:00:00:1a:20" }
+        vxlan:
+            - { vni: "vni10", vid: "10" }
+            - { vni: "vni20", vid: "20" }
+        server_port: "swp2"
+
+    server01:
+        leaf_port: "eth1"
+        ip1: "192.168.10.10/24"
+        gateway1: "192.168.10.1"
+
+    server02:
+        leaf_port: "eth2"
+        ip1: "192.168.20.10/24"
+        gateway1: "192.168.20.1"

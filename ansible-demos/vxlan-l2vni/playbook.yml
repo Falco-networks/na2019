@@ -6,8 +6,8 @@
     vars_files:
       - vars.yml
     tasks:
-    #Task 1: Configure BGP parameters on spine switches
-    - name: configure spine01 for BGP Unnumbered (BGP config)
+    #Task 1: Configure BGP unnumbered 
+    - name: configure spine01 for BGP Unnumbered
       nclu:
         commands:
         - add loopback lo ip address {{ devices[ansible_hostname].loopback }}
@@ -33,6 +33,12 @@
         - add routing route-map allow-loopback deny 20
         - add bgp redistribute connected route-map allow-loopback
         commit: true
+    #Task4: Enable EVPN VXLAN
+    - name: Configure EVPN VXLAN
+      nclu:
+        commands:
+        - add bgp l2vpn evpn neighbor {{ item }} activate
+      with_items: "{{ devices[ansible_hostname].leaf_ports }}"
   
   
   #Setup Play2: Configure leaf switches
@@ -84,6 +90,13 @@
           - add routing route-map allow-loopback deny 20
           - add bgp redistribute connected route-map allow-loopback
           commit: true
+
+      #Task 6:
+      - name: Configure EVPN VXLAN
+        nclu:
+          commands:
+          - add
+        with_items: "{{ devices[ansible_hostname].spine_ports }}"
   
   #Setup Play4: Configure the servers for the demo
   - name: configure servers
