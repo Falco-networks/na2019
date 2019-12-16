@@ -1,13 +1,13 @@
 ---
-  #Setup Play1: Configure spine switches
-  - name: configure spine01
-    hosts: spine01
+  #Setup Play1: Configure switches
+  - name: "Play1: Configure Spine01, Leaf01 and leaf02 for BGP"
+    hosts: spine01:leaf01:leaf02
     become: yes
     vars_files:
       - vars.yml
     tasks:
     #Task 1: Configure BGP Unnumbered and announce loopbacks 
-    - name: configure spine01 for BGP Unnumbered
+    - name: configure switches for BGP Unnumbered
       nclu:
         commands:
         - add loopback lo ip address {{ devices[ansible_hostname].loopback }}
@@ -22,7 +22,7 @@
         - add bgp neighbor {{ item }} capability extended-nexthop
         commit: false
       #with_items creates a list from the variables mentiond in the vars.yml file and will parse the list with the commands above. If there a 4 values in the list the commands will run 4 times
-      with_items: "{{ devices[ansible_hostname].leaf_ports }}"
+      with_items: "{{ devices[ansible_hostname].bgp_ports }}"
 
     #Task 3: Announce loopbacks in BGP
     - name: Announce loopbacks in BGP
@@ -34,12 +34,50 @@
         - add bgp redistribute connected route-map allow-loopback
         commit: false
 
-    #Task4: Enable EVPN VXLAN
-    - name: Configure EVPN VXLAN
+    - name: Enable VXLAN
       nclu:
         commands:
         - add bgp l2vpn evpn neighbor {{ item }} activate
+        commit: false
+      with_items: "{{ devices[ansible_hostname].bgp_ports }}"
+
+    - name: Advertise all vni and commit all changes
+      nclu:
+        commands:
+        - add bgp l2vpn evpn advertise-all-vni
         commit: true
-      with_items: "{{ devices[ansible_hostname].leaf_ports }}"
+
+
+  #Setup Play2: Configure leaf switches
+  - name: "Play2: Configure vlans on leaf switches"
+    hosts: leaf01:leaf02
+    become: yes
+    vars_files:
+      - vars.yml
+
+    tasks:
+    - name: Create vlans and svi's
+      nclu:
+        commands:
+        - add vlan {{ item.vid }} ip address {{ item.ip }}
+        - add vlan {{ item.vid }} ip address-virtual {{ item.vrr_mac }} {{ item.vrr_ip }}
+        - add interface swp1 bridge trunk vlans {{ item.vid }}
+        commit: false
+      with_items: "{{ devices[ansible_hostname].vlans }}"
+
+    - name: Create VNI's and map to vlans
+      nclu:
+        commands:
+        - add vxlan {{ item.vni }} vxlan id {{ item.vid }}
+        - add vxlan {{ item.vni }} vxlan local-tunnelip {{ devices[ansible_hostname].loopback }}
+        - add vxlan {{ item.vni }} bridge access {{ item.vid }}
+        - add vxlan {{ item.vni }} bridge learning off
+        commit: true
+      with_items: "{{ devices[ansible_hostname].vxlan }}"
+
+
+
+
+  
   
   

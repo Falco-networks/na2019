@@ -4,7 +4,7 @@ devices:
         hostname: "spine01"
         loopback: "10.0.0.21/32"
         as: "65020"
-        leaf_ports: 
+        bgp_ports: 
             - "swp1"
             - "swp2"
 
@@ -12,7 +12,7 @@ devices:
         hostname: "leaf01"
         loopback: "10.0.0.11/32"
         as: "65011"
-        spine_ports:
+        bgp_ports:
             - "swp51"
         vlans:
             - { vid: "10", ip: "192.168.10.11/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
@@ -27,7 +27,7 @@ devices:
         hostname: "leaf02"
         loopback: "10.0.0.12/32"
         as: "65012"
-        spine_ports:
+        bgp_ports:
             - "swp51"
         vlans:
             - { vid: "10", ip: "192.168.10.12/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
