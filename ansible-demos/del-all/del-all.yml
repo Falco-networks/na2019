@@ -19,12 +19,15 @@
       become: yes
 
       tasks:
-      - name: Delete interface config from server
-        file:
-          path: /etc/network/interfaces.d/uplink.cfg
-          state: absent
-
-      - name: Reboot server
-        shell: "sleep 5 && reboot"
-        async: 1
-        poll: 0
+        - name: Delete interface config from server
+          file:
+            path: /etc/network/interfaces.d/uplink.cfg
+            state: absent
+          notify: reboot server
+  
+      
+      handlers:
+        - name: reboot server
+          shell: "sleep 5 && reboot"
+          async: 1
+          poll: 0
