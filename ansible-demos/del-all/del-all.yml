@@ -15,7 +15,7 @@
 
     #Setup Play2: delete interface config from servers and reboot the server
     - name: delete interface config from servers and reboot the server
-      hosts: server01:server03
+      hosts: servers
       become: yes
 
       tasks:
