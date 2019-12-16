@@ -7,45 +7,45 @@
       - vars.yml
     tasks:
     #Task 1: Configure BGP Unnumbered and announce loopbacks 
-    - name: configure switches for BGP Unnumbered
-      nclu:
-        commands:
-        - add loopback lo ip address {{ devices[ansible_hostname].loopback }}
-        - add bgp autonomous-system {{ devices[ansible_hostname].as }}
-        commit: false
-    
-    #Task 2: Configure BGP neighbors and enable BGP unnumbered on the interfaces to the leafs
-    - name: Configure bgp neighbors
-      nclu:
-        commands:
-        - add bgp neighbor {{ item }} interface remote-as external
-        - add bgp neighbor {{ item }} capability extended-nexthop
-        commit: false
-      #with_items creates a list from the variables mentiond in the vars.yml file and will parse the list with the commands above. If there a 4 values in the list the commands will run 4 times
-      with_items: "{{ devices[ansible_hostname].bgp_ports }}"
-
-    #Task 3: Announce loopbacks in BGP
-    - name: Announce loopbacks in BGP
-      nclu: 
-        commands:
-        - add routing route-map allow-loopback permit 10 match interface lo
-        - add routing route-map allow-loopback permit 10 set origin igp
-        - add routing route-map allow-loopback deny 20
-        - add bgp redistribute connected route-map allow-loopback
-        commit: false
-
-    - name: Enable VXLAN
-      nclu:
-        commands:
-        - add bgp l2vpn evpn neighbor {{ item }} activate
-        commit: false
-      with_items: "{{ devices[ansible_hostname].bgp_ports }}"
-
-    - name: Advertise all vni and commit all changes
-      nclu:
-        commands:
-        - add bgp l2vpn evpn advertise-all-vni
-        commit: true
+      - name: configure switches for BGP Unnumbered
+        nclu:
+          commands:
+          - add loopback lo ip address {{ devices[ansible_hostname].loopback }}
+          - add bgp autonomous-system {{ devices[ansible_hostname].as }}
+          commit: false
+      
+      #Task 2: Configure BGP neighbors and enable BGP unnumbered on the interfaces to the leafs
+      - name: Configure bgp neighbors
+        nclu:
+          commands:
+          - add bgp neighbor {{ item }} interface remote-as external
+          - add bgp neighbor {{ item }} capability extended-nexthop
+          commit: false
+        #with_items creates a list from the variables mentiond in the vars.yml file and will parse the list with the commands above. If there a 4 values in the list the commands will run 4 times
+        with_items: "{{ devices[ansible_hostname].bgp_ports }}"
+  
+      #Task 3: Announce loopbacks in BGP
+      - name: Announce loopbacks in BGP
+        nclu: 
+          commands:
+          - add routing route-map allow-loopback permit 10 match interface lo
+          - add routing route-map allow-loopback permit 10 set origin igp
+          - add routing route-map allow-loopback deny 20
+          - add bgp redistribute connected route-map allow-loopback
+          commit: false
+  
+      - name: Enable VXLAN
+        nclu:
+          commands:
+          - add bgp l2vpn evpn neighbor {{ item }} activate
+          commit: false
+        with_items: "{{ devices[ansible_hostname].bgp_ports }}"
+  
+      - name: Advertise all vni and commit all changes
+        nclu:
+          commands:
+          - add bgp l2vpn evpn advertise-all-vni
+          commit: true
 
 
   #Setup Play2: Configure leaf switches
@@ -56,24 +56,24 @@
       - vars.yml
 
     tasks:
-    - name: Create vlans and svi's
-      nclu:
-        commands:
-        - add vlan {{ item.vid }} ip address {{ item.ip }}
-        - add vlan {{ item.vid }} ip address-virtual {{ item.vrr_mac }} {{ item.vrr_ip }}
-        - add interface {{ devices[ansible_hostname].server_port }} bridge trunk vlans {{ item.vid }}
-        commit: false
-      with_items: "{{ devices[ansible_hostname].vlans }}"
-
-    - name: Create VNI's and map to vlans
-      nclu:
-        commands:
-        - add vxlan {{ item.vni }} vxlan id {{ item.vid }}
-        - add vxlan {{ item.vni }} vxlan local-tunnelip {{ item.tunnel_ip }}
-        - add vxlan {{ item.vni }} bridge access {{ item.vid }}
-        - add vxlan {{ item.vni }} bridge learning off
-        commit: true
-      with_items: "{{ devices[ansible_hostname].vxlan }}"
+      - name: Create vlans and svi's
+        nclu:
+          commands:
+          - add vlan {{ item.vid }} ip address {{ item.ip }}
+          - add vlan {{ item.vid }} ip address-virtual {{ item.vrr_mac }} {{ item.vrr_ip }}
+          - add interface {{ devices[ansible_hostname].server_port }} bridge trunk vlans {{ item.vid }}
+          commit: false
+        with_items: "{{ devices[ansible_hostname].vlans }}"
+  
+      - name: Create VNI's and map to vlans
+        nclu:
+          commands:
+          - add vxlan {{ item.vni }} vxlan id {{ item.vid }}
+          - add vxlan {{ item.vni }} vxlan local-tunnelip {{ item.tunnel_ip }}
+          - add vxlan {{ item.vni }} bridge access {{ item.vid }}
+          - add vxlan {{ item.vni }} bridge learning off
+          commit: true
+        with_items: "{{ devices[ansible_hostname].vxlan }}"
 
   #Setup Play3: Configure server
   - name: "Play3: Configure servers"
@@ -84,36 +84,38 @@
     
     tasks:
     
-    - name: Add /etc/network/interfaces.d/uplink.cfg file
-      copy:
-        dest: "/etc/network/interfaces.d/uplink.cfg"
-        content: |
-          auto {{ devices[ansible_hostname].leaf_port }}
-          iface {{ devices[ansible_hostname].leaf_port }}
-              bridge-vids 10 20
-          
-          auto bridge
-          iface bridge
-              bridge-ports {{ devices[ansible_hostname].leaf_port }}
-              bridge-vids 10 20
-              bridge-vlan-aware yes
-          
-          auto vlan10
-          iface vlan10
-              address {{ devices[ansible_hostname].vlan10_ip }}
-              vlan-id 10
-              vlan-raw-device bridge
-          
-          auto vlan20
-          iface vlan20
-              address {{ devices[ansible_hostname].vlan20_ip }}
-              vlan-id 20
-              vlan-raw-device bridge
-    
-    - name: restart networking
-      service: 
-        name: networking
-        state: restarted
+      - name: Add /etc/network/interfaces.d/uplink.cfg file
+        copy:
+          dest: "/etc/network/interfaces.d/uplink.cfg"
+          content: |
+            auto {{ devices[ansible_hostname].leaf_port }}
+            iface {{ devices[ansible_hostname].leaf_port }}
+                bridge-vids 10 20
+            
+            auto bridge
+            iface bridge
+                bridge-ports {{ devices[ansible_hostname].leaf_port }}
+                bridge-vids 10 20
+                bridge-vlan-aware yes
+            
+            auto vlan10
+            iface vlan10
+                address {{ devices[ansible_hostname].vlan10_ip }}
+                vlan-id 10
+                vlan-raw-device bridge
+            
+            auto vlan20
+            iface vlan20
+                address {{ devices[ansible_hostname].vlan20_ip }}
+                vlan-id 20
+                vlan-raw-device bridge
+        notify: restart networking
+
+    handlers:
+      - name: restart networking
+        service: 
+          name: networking
+          state: restarted
     
 
 
