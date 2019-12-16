@@ -69,7 +69,7 @@
       nclu:
         commands:
         - add vxlan {{ item.vni }} vxlan id {{ item.vid }}
-        - add vxlan {{ item.vni }} vxlan local-tunnelip {{ devices[ansible_hostname].loopback }}
+        - add vxlan {{ item.vni }} vxlan local-tunnelip {{ item.tunnel_ip }}
         - add vxlan {{ item.vni }} bridge access {{ item.vid }}
         - add vxlan {{ item.vni }} bridge learning off
         commit: true

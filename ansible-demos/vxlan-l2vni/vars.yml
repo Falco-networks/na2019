@@ -18,8 +18,8 @@ devices:
             - { vid: "10", ip: "192.168.10.11/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
             - { vid: "20", ip: "192.168.20.11/24", vrr_ip: "192.168.20.1/24", vrr_mac: "00:00:00:00:1a:20" }
         vxlan:
-            - { vni: "vni10", vid: "10" }
-            - { vni: "vni20", vid: "20" }
+            - { vni: "vni10", vid: "10", tunnel_ip: "10.0.0.11" }
+            - { vni: "vni20", vid: "20", tunnel_ip: "10.0.0.11" }
         server_port: "swp1"
             
 
@@ -33,8 +33,8 @@ devices:
             - { vid: "10", ip: "192.168.10.12/24", vrr_ip: "192.168.10.1/24", vrr_mac: "00:00:00:00:1a:10" }
             - { vid: "20", ip: "192.168.20.12/24", vrr_ip: "192.168.20.1/24", vrr_mac: "00:00:00:00:1a:20" }
         vxlan:
-            - { vni: "vni10", vid: "10" }
-            - { vni: "vni20", vid: "20" }
+            - { vni: "vni10", vid: "10", tunnel_ip: "10.0.0.12" }
+            - { vni: "vni20", vid: "20", tunnel_ip: "10.0.0.12" }
         server_port: "swp2"
 
     server01:
