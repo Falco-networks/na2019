@@ -75,6 +75,48 @@
         commit: true
       with_items: "{{ devices[ansible_hostname].vxlan }}"
 
+  #Setup Play3: Configure server
+  - name: "Play3: Configure servers"
+    hosts: server01:server02
+    become: yes
+    vars_files:
+      - vars.yml
+    
+    tasks:
+    
+    - name: Add /etc/network/interfaces.d/uplink.cfg file
+      copy:
+        dest: "/etc/network/interfaces.d/uplink.cfg"
+        content: |
+          auto {{ devices[ansible_hostname].leaf_port }}
+          iface {{ devices[ansible_hostname].leaf_port }}
+              bridge-vids 10 20
+          
+          auto bridge
+          iface bridge
+              bridge-ports {{ devices[ansible_hostname].leaf_port }}
+              bridge-vids 10 20
+              bridge-vlan-aware yes
+          
+          auto vlan10
+          iface vlan10
+              address {{ devices[ansible_hostname].vlan10_ip }}
+              vlan-id 10
+              vlan-raw-device bridge
+          
+          auto vlan20
+          iface vlan20
+              address {{ devices[ansible_hostname].vlan20_ip }}
+              vlan-id 20
+              vlan-raw-device bridge
+    
+    - name: restart networking
+      service: 
+        name: networking
+        state: restarted
+    
+
+
 
 
 
