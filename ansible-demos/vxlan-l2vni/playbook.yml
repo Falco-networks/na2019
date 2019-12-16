@@ -61,7 +61,7 @@
         commands:
         - add vlan {{ item.vid }} ip address {{ item.ip }}
         - add vlan {{ item.vid }} ip address-virtual {{ item.vrr_mac }} {{ item.vrr_ip }}
-        - add interface swp1 bridge trunk vlans {{ item.vid }}
+        - add interface {{ devices[ansible_hostname].server_port }} bridge trunk vlans {{ item.vid }}
         commit: false
       with_items: "{{ devices[ansible_hostname].vlans }}"
 
