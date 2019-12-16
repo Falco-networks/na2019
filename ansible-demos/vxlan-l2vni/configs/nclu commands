@@ -1,0 +1,130 @@
+commands:
+
+Spine01:
+net add loopback lo ip address 10.0.0.21/32
+net add bgp autonomous-system 65020
+net add bgp neighbor swp1 remote-as external
+net add bgp neighbor swp1 capability extended-nexthop
+net add bgp neighbor swp2 remote-as external
+net add bgp neighbor swp2 capability extended-nexthop
+net add routing route-map allow-loopback permit 10 match interface lo
+net add routing route-map allow-loopback permit 10 set origin igp
+net add routing route-map allow-loopback deny 20
+net add bgp redistribute connected route-map allow-loopback
+net add bgp l2vpn evpn neighbor swp1 activate
+net add bgp l2vpn evpn neighbor swp2 activate
+
+
+
+leaf01:
+net add loopback lo ip address 10.0.0.11/32
+net add bgp autonomous-system 65011
+net add bgp neighbor swp51 remote-as external
+net add bgp neighbor swp51 capability extended-nexthop
+net add routing route-map allow-loopback permit 10 match interface lo
+net add routing route-map allow-loopback permit 10 set origin igp
+net add routing route-map allow-loopback deny 20
+net add bgp redistribute connected route-map allow-loopback
+net add bgp l2vpn evpn neighbor swp51 activate
+
+net add vlan 10 ip address 192.168.10.11/24
+net add vlan 20 ip address 192.168.20.11/24
+net add vlan 10 ip address-virtual 00:00:00:00:1a:10 192.168.10.1/24
+net add vlan 20 ip address-virtual 00:00:00:00:1a:20 192.168.20.1/24
+net add interface swp1 bridge trunk vlans 10,20
+
+
+net add vxlan vni10 vxlan id 10
+net add vxlan vni10 vxlan local-tunnelip 10.0.0.11
+net add vxlan vni10 bridge access 10
+net add vxlan vni10 bridge learning off
+
+net add vxlan vni20 vxlan id 20
+net add vxlan vni20 vxlan local-tunnelip 10.0.0.11
+net add vxlan vni20 bridge access 20
+net add vxlan vni20 bridge learning off
+
+net add bgp l2vpn evpn advertise-all-vni
+
+
+
+leaf02:
+net add loopback lo ip address 10.0.0.12/32
+net add bgp autonomous-system 65012
+net add bgp neighbor swp51 remote-as external
+net add bgp neighbor swp51 capability extended-nexthop
+net add routing route-map allow-loopback permit 10 match interface lo
+net add routing route-map allow-loopback permit 10 set origin igp
+net add routing route-map allow-loopback deny 20
+net add bgp redistribute connected route-map allow-loopback
+net add bgp l2vpn evpn neighbor swp51 activate
+
+net add vlan 10 ip address 192.168.10.12/24
+net add vlan 20 ip address 192.168.20.12/24
+net add vlan 10 ip address-virtual 00:00:00:00:1a:10 192.168.10.1/24
+net add vlan 20 ip address-virtual 00:00:00:00:1a:20 192.168.20.1/24
+net add interface swp2 bridge trunk vlans 10,20
+
+net add vxlan vni10 vxlan id 10
+net add vxlan vni10 vxlan local-tunnelip 10.0.0.12
+net add vxlan vni10 bridge access 10
+net add vxlan vni10 bridge learning off
+
+net add vxlan vni20 vxlan id 20
+net add vxlan vni20 vxlan local-tunnelip 10.0.0.12
+net add vxlan vni20 bridge access 20
+net add vxlan vni20 bridge learning off
+
+net add bgp l2vpn evpn advertise-all-vni
+
+
+
+
+server01:
+
+auto eth1
+iface eth1
+    bridge-vids 10 20
+
+auto bridge
+iface bridge
+    bridge-ports eth1
+    bridge-vids 10 20
+    bridge-vlan-aware yes
+
+auto vlan10
+iface vlan10
+    address 192.168.10.101/24
+    vlan-id 10
+    vlan-raw-device bridge
+
+auto vlan20
+iface vlan20
+    address 192.168.20.101/24
+    vlan-id 20
+    vlan-raw-device bridge
+
+server02:
+
+auto eth2
+iface eth2
+    bridge-vids 10 20
+
+auto bridge
+iface bridge
+    bridge-ports eth2
+    bridge-vids 10 20
+    bridge-vlan-aware yes
+
+auto vlan10
+iface vlan10
+    address 192.168.10.102/24
+    vlan-id 10
+    vlan-raw-device bridge
+
+auto vlan20
+iface vlan20
+    address 192.168.20.102/24
+    vlan-id 20
+    vlan-raw-device bridge
+
