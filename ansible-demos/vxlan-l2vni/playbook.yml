@@ -85,7 +85,7 @@
     tasks:
 
       - name: get ifupdown version
-        command: "apt list --installed | grep ifupdown"
+        command: "apt list --installed"
         register: server_ifupdown
 
       - name: remove interfaces file
