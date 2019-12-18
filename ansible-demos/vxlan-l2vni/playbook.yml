@@ -84,6 +84,10 @@
     
     tasks:
 
+      - name: get ifupdown version
+        command: "apt list --installed | grep ifupdown"
+        register: server_ifupdown
+
       - name: remove interfaces file
         file:
           path: /etc/network/interfaces
@@ -130,6 +134,35 @@
                 address {{ devices[ansible_hostname].vlan20_ip }}
                 vlan-id 20
                 vlan-raw-device bridge
+        when: "'ifupdown2' | string in server_ifupdown"
+        notify: restart networking
+
+      - name: Add /etc/network/interfaces.d/uplink.cfg file
+        copy:
+          dest: "/etc/network/interfaces.d/uplink.cfg"
+          content: |
+            auto {{ devices[ansible_hostname].leaf_port }}
+            iface {{ devices[ansible_hostname].leaf_port }}
+                bridge-vids 10 20
+            
+            auto bridge
+            iface bridge
+                bridge-ports {{ devices[ansible_hostname].leaf_port }}
+                bridge-vids 10 20
+                bridge-vlan-aware yes
+            
+            auto vlan10
+            iface vlan10
+                address {{ devices[ansible_hostname].vlan10_ip }}
+                vlan-id 10
+                vlan-raw-device bridge
+            
+            auto vlan20
+            iface vlan20
+                address {{ devices[ansible_hostname].vlan20_ip }}
+                vlan-id 20
+                vlan-raw-device bridge
+        when: "'ifupdown2' | string not in server_ifupdown"
         notify: restart networking
 
     handlers:
