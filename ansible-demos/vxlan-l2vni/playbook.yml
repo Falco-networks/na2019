@@ -109,7 +109,7 @@
             auto eth0
             iface eth0 inet dhcp
     
-      - name: Add /etc/network/interfaces.d/uplink.cfg file
+      - name: Add /etc/network/interfaces.d/uplink.cfg file (ifupdown2)
         copy:
           dest: "/etc/network/interfaces.d/uplink.cfg"
           content: |
@@ -137,31 +137,19 @@
         when: "'ifupdown2' | string in server_ifupdown"
         notify: restart networking
 
-      - name: Add /etc/network/interfaces.d/uplink.cfg file
+      - name: Add /etc/network/interfaces.d/uplink.cfg file (ifupdown1)
         copy:
           dest: "/etc/network/interfaces.d/uplink.cfg"
           content: |
-            auto {{ devices[ansible_hostname].leaf_port }}
-            iface {{ devices[ansible_hostname].leaf_port }}
-                bridge-vids 10 20
-            
-            auto bridge
-            iface bridge
-                bridge-ports {{ devices[ansible_hostname].leaf_port }}
-                bridge-vids 10 20
-                bridge-vlan-aware yes
-            
-            auto vlan10
-            iface vlan10
-                address {{ devices[ansible_hostname].vlan10_ip }}
-                vlan-id 10
-                vlan-raw-device bridge
-            
-            auto vlan20
-            iface vlan20
-                address {{ devices[ansible_hostname].vlan20_ip }}
-                vlan-id 20
-                vlan-raw-device bridge
+            auto {{ devices[ansible_hostname].leaf_port }}.10
+            iface {{ devices[ansible_hostname].leaf_port }}.10 inet static
+            address {{ devices[ansible_hostname].vlan10_ip2 }}
+            netmask {{ devices[ansible_hostname].vlan10_mask }}
+
+            auto {{ devices[ansible_hostname].leaf_port }}.20
+            iface {{ devices[ansible_hostname].leaf_port }}.20 inet static
+            address {{ devices[ansible_hostname].vlan20_ip2 }}
+            netmask {{ devices[ansible_hostname].vlan20_mask }}
         when: "'ifupdown2' | string not in server_ifupdown"
         notify: restart networking
 
